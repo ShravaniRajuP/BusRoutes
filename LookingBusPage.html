@@ -16,12 +16,8 @@
         <!-- Scrollbar Custom CSS -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 
-        <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
-
-        <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
-
         <!-- JS, Popper.js, and jQuery -->
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
@@ -30,11 +26,14 @@
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-drawer/1.0.6/js/drawer.min.js"></script>
 
-        <!-- Map API -->
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcj2_3-CK6Wsy8xsa6MBetFNRTVekb-aM&callback=myMap"></script>
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
-        <!-- 511.org -->
-        <script src="http://api.511.org/transit/lines?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&operator_id=AC"></script>
+        <!-- Map API -->
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcj2_3-CK6Wsy8xsa6MBetFNRTVekb-aM&callback=initMap"> </script>
+
+        <!-- <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script> -->
+        <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+
 
         <script type="text/javascript">
             $(document).ready(function () {
@@ -59,16 +58,134 @@
                     $('.collapse.in').addClass('in');
                     $('a[aria-expanded=true]').attr('aria-expanded', 'false');
                 });
+
+                var options = {
+                    animationEnabled: true,  
+                    title:{ text: "Monthly Sales - 2017" },
+                    axisX: { valueFormatString: "MMM" },
+                    axisY: { title: "Sales (in USD)", prefix: "$", includeZero: false },
+                    data: [{
+                        yValueFormatString: "$#,###",
+                        xValueFormatString: "MMMM",
+                        type: "spline",
+                        dataPoints: [
+                            { x: new Date(2017, 0), y: 25060 },
+                            { x: new Date(2017, 1), y: 27980 },
+                            { x: new Date(2017, 2), y: 33800 },
+                            { x: new Date(2017, 3), y: 49400 },
+                            { x: new Date(2017, 4), y: 40260 },
+                            { x: new Date(2017, 5), y: 33900 },
+                            { x: new Date(2017, 6), y: 48000 },
+                            { x: new Date(2017, 7), y: 31500 },
+                            { x: new Date(2017, 8), y: 32300 },
+                            { x: new Date(2017, 9), y: 42000 },
+                            { x: new Date(2017, 10), y: 52160 },
+                            { x: new Date(2017, 11), y: 49400 }
+                        ]
+                    }]
+                };
+                $("#chartContainer").CanvasJSChart(options);
             });
 
-            $(document).ready(function myMap() {
-                var route = new google.maps.LatLng(37.7749, -122.4194)
-                var mapProp= {
-                  center: route, zoom: 13,
-                };
-                var map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
-                var marker = new google.maps.Marker({position: route, map: map});
-            });
+            function initMap() { 
+                var directionsService = new google.maps.DirectionsService();
+                var directionsRenderer = new google.maps.DirectionsRenderer();
+                var origin = new google.maps.LatLng(37.44375, -122.165763);
+                var destination = new google.maps.LatLng(37.424787, -122.145651);
+                var mapProp= { center: origin, zoom: 13};
+                var map = new google.maps.Map(document.getElementById('googleMap'), mapProp);
+                directionsRenderer.setMap(map);
+                calculateAndDisplayRoute(directionsService, directionsRenderer, origin, destination ); 
+
+                //*polypoints[i-1], polypoints[i]*/
+                // fetch('http://api.511.org/transit/timetable?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&operator_id=SC&line_id=22&format=JSON').then(function (response) {
+                //     return response.json();
+                // }).then(function (obj) {
+                //     console.log(obj);
+                //     // obj.Contents.dataObjects.ScheduledStopPoint.forEach(function(item) {
+                //         // console.log(item.Location.Latitude, item.Location.Longitude);
+                //         // var route = new google.maps.LatLng(item.Location.Latitude, item.Location.Longitude);
+                //         // var map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
+                //         // var marker = new google.maps.Marker({position: route, map: map});
+                //         // var route = new google.maps.LatLng(37.7749, -122.4194);
+                //     // });
+                // }).catch(function (error) {
+                //     console.error('Something went wrong');
+                // });
+            }
+
+            function calculateAndDisplayRoute(directionsService, directionsRenderer, o, d) {
+                directionsService.route({
+                    origin: new google.maps.LatLng(37.44375, -122.165763),
+                    destination: new google.maps.LatLng(37.424787, -122.145651),
+                    travelMode: 'DRIVING'
+                },
+                function(response, status) {
+                    if (status === 'OK') {
+                        directionsRenderer.setDirections(response);
+                    } else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
+            }
+
+            // $(document).ready(function() {
+            //     $.ajax({
+            //         type: "GET",
+            //         // url: "22_.xml",
+            //         url: "http://api.511.org/transit/VehicleMonitoring?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&agency=SC&format=JSON",
+            //         dataType: "xml", 
+            //         success: xmlParser,
+            //         error: justMap
+            //     });
+            // });
+
+            // function xmlParser(xml) {
+            //     fetch('xml').
+
+                // $(xml).find("VehicleLocation").each(function() {
+                    // var route = []
+                    // if($(this).find("LineRef").text() == "22"){                    
+                    //     // $(this).find("O")
+                    //     route.push(new google.maps.LatLng($(this).find("Latitude").text(), $(this).find("Longitude").text()))
+                    //     // var route = new google.maps.LatLng($(this).find("Latitude").text(), $(this).find("Longitude").text())
+                    //     var mapProp= { center: route[0], zoom: 13 };
+                    //     var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+                    //     var marker = new google.maps.Marker({position: route[0], map: map});
+                    // }
+                    // else { 
+                    //     return; 
+                    //     // var route = new google.maps.LatLng(37.7749, 122.4194)
+                    //     // var mapProp= {
+                    //     //   center: route, zoom: 13,
+                    //     // };
+                    //     // var map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
+                    //     // var marker = new google.maps.Marker({position: route, map: map});
+                    // }
+                //}//);
+            //}
+
+            // function xmlParser() {
+            //     var route = new google.maps.LatLng(37.7749, 122.4194)
+            //     var mapProp= {
+            //       center: route, zoom: 13,
+            //     };
+            //     var map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
+            //     var marker = new google.maps.Marker({position: route, map: map});
+            // }
+
+            // function justMap() {
+            //     var route = new google.maps.LatLng(37.7749, -122.4194)
+            //     var mapProp= {
+            //       center: route, zoom: 13,
+            //     };
+            //     var map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
+            //     var marker = new google.maps.Marker({position: route, map: map});
+        //     // }
+         
+        //     window.onload = function () {
+
+        // }
         </script>
 	</head>
 
@@ -79,112 +196,45 @@
 
         <nav id="bottomdrawer">
             <div id="dismiss">
-                <i class="fas fa-arrow-down"></i>
+                <i class="fa fa-arrow-down" aria-hidden="true"></i>
             </div>
 
             <div class="bottomdrawer-header">
                 <h3>Bootstrap bottomdrawer</h3>
+                <div id="chartContainer" style="height:250px; width: 100%;"></div>
             </div>
-
-            <ul class="list-unstyled components">
-                <p>Dummy Heading</p>
-                <li class="active">
-                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">Home</a>
-                    <ul class="collapse list-unstyled" id="homeSubmenu">
-                        <li>
-                            <a href="#">Home 1</a>
-                        </li>
-                        <li>
-                            <a href="#">Home 2</a>
-                        </li>
-                        <li>
-                            <a href="#">Home 3</a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#">About</a>
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false">Pages</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu">
-                        <li>
-                            <a href="#">Page 1</a>
-                        </li>
-                        <li>
-                            <a href="#">Page 2</a>
-                        </li>
-                        <li>
-                            <a href="#">Page 3</a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#">Portfolio</a>
-                </li>
-                <li>
-                    <a href="#">Contact</a>
-                </li>
-            </ul>
-
-            <ul class="list-unstyled CTAs">
-                <li>
-                    <a href="https://bootstrapious.com/tutorial/files/bottomdrawer.zip" class="download">Download source</a>
-                </li>
-                <li>
-                    <a href="https://bootstrapious.com/p/bootstrap-bottomdrawer" class="article">Back to article</a>
-                </li>
-            </ul>
         </nav>
 
         <div class="wrapper">
             <!-- Sidebar Holder -->
             <nav id="sidebar" class="sticky-top">
-                <div class="sidebar-header">
+                <!-- <div class="sidebar-header">
                     Meh
-                </div>
+                </div> -->
 
                 <ul class="list-unstyled components">
                     <li class="active">
                         <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">
-                            Home
-                        </a>
+                            <i class="fa fa-home"></i>  Home</a>
                         <ul class="collapse list-unstyled" id="homeSubmenu">
                             <li><a href="#">Home 1</a></li>
                             <li><a href="#">Home 2</a></li>
                             <li><a href="#">Home 3</a></li>
                         </ul>
                     </li>
+                    <li><a href="#"><i class="fa fa-briefcase"></i>  About</a></li>
                     <li>
-                        <a href="#">
-                            About
-                        </a>
                         <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false">
-                            <i class="glyphicon glyphicon-duplicate"></i>
-                            Pages
-                        </a>
+                            <i class="fa fa-copy"></i>  Pages</a>
                         <ul class="collapse list-unstyled" id="pageSubmenu">
                             <li><a href="#">Page 1</a></li>
                             <li><a href="#">Page 2</a></li>
                             <li><a href="#">Page 3</a></li>
                         </ul>
                     </li>
-                    <li>
-                        <a href="#">
-                            <i class="glyphicon glyphicon-link"></i>
-                            Portfolio
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="glyphicon glyphicon-paperclip"></i>
-                            FAQ
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="glyphicon glyphicon-send"></i>
-                            Contact
-                        </a>
-                    </li>
+                    <li><a href="#"><i class="fa fa-link"></i>  Portfolio</a></li>
+                    <li><a href="#"><i class="fa fa-paperclip"></i>  FAQ</a></li>
+                    <li><a href="#"><i class="fa fa-paper-plane"></i>  Contact</a></li>
                 </ul>
 
                 <ul class="list-unstyled CTAs">
@@ -197,19 +247,15 @@
             <div id="content">
 
                 <!-- NavBar -->
-                <nav id="mainNav" class="navbar navbar-expand-lg sticky-top">
+                <nav class="navbar navbar-expand-lg d-flex justify-content-around sticky-top">
                     <div class="container">
                         <img  id="sidebarCollapse" src="images/lookingbus.png" alt="LookingBus">
-                        <!-- <button type="button" id="bottomdrawerCollapse" class="btn btn-info">
-                            <i class="fas fa-align-left btn-info"></i>
-                            <span>Toggle bottomdrawer</span>
-                        </button> -->
 
                         <img  id="bottomdrawerCollapse" src="images/chart.png" alt="Chart">
 
                         <button class="navbar-toggler navbar-toggler-right collapsed" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                             Menu
-                            <i class="fas fa-bars"></i>
+                            <i class="fa fa-bars"></i>
                         </button>
 
                         <div class="collapse navbar-collapse" id="navbarResponsive" >
@@ -229,7 +275,7 @@
                 </nav>
 
                 <!-- Map -->
-                    <div id="googleMap" style="width:100%;height:100vh;"></div>
+                <div id="googleMap" style="width:calc(100vw-20px); height:100vmin;"></div>
             </div>
         </div>
 	</body> 
