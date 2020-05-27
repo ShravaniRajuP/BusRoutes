@@ -10,6 +10,11 @@ body {
     width: 100%;
 }
 
+#map {
+    flex: 0 0 88%; 
+    height: 100vh;
+}
+
  /* The navigation bar */
 .navbar {
     font: small-caps 0.8em 'Catamaran', 'Helvetica', 'Arial', 'sans-serif';
@@ -19,9 +24,6 @@ body {
     border-radius: 0;
     margin-bottom: 40px;
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-    /*width: calc(100vmax - 250px);*/
-    /*min-width: 100vh;
-    max-width: calc(100vmax - 250px);*/
 }
 
 .navbar img {
@@ -38,6 +40,7 @@ body {
     SIDEBAR STYLE
 ----------------------------------------------------- */
 .wrapper {
+    flex: 0 0 88%; /* ~ 2 * 33.33% */
     display: flex;
     width: 100%;
     align-items: stretch;
@@ -141,7 +144,9 @@ a.article, a.article:hover {
     CONTENT STYLE
 ----------------------------------------------------- */
 #content {
-    min-width: 100vmin;
+    max-width: 100vw;
+    min-width: calc(100vmin - 250px);
+    width: calc(100vw - 50px);
     padding: 20px;
     min-height: calc(100vh - 400px);
     transition: all 0.3s;
