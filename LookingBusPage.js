@@ -1,3 +1,15 @@
+var polypoints = {};
+var datapoints = [];
+var way_points = [];
+var way_point = [];
+var vechicleref = 0;
+var origin = 0;
+var destination = 0;
+var count = 0;
+var marker_bus = null;
+var timing_Departure = [];
+var timing_Arrival = [];
+
 function sideBar() {
 	$('#sidebarCollapse').on('click', function () {
 		$('#sidebar').toggleClass('active');
@@ -20,49 +32,68 @@ function bottomwDrawer() {
 		$('.collapse.in').addClass('in');
 		$('a[aria-expanded=true]').attr('aria-expanded', 'false');
 	});
-
-	makeChart();
 }
 
 function makeChart(){
+	var dps1 = [];
+	var dps2 = [];
+	var dps3 = [];
+	var stops = ["PAT-Cal", "Cal-Sh", "Sh-Cas", "Cas-Su_Sa", "Su_Sa-W", "Wo-Ke", "Ke-SCTC", "SCT-AN", 
+				"AN-SC1st", "SC-KAR", "KAR-KS", "KS-ETC"];
+	console.log(timing_Departure[0].length);
+	console.log(timing_Departure[Math.floor(timing_Departure.length/3)].length);
+	for (var i=1; i < timing_Departure[0].length; i++) {
+		dps1.push({y: ((-timing_Departure[0][i-1] + timing_Arrival[0][i])/60), label: stops[i-1]});
+	}
+	for (var i=1; i < timing_Departure[Math.floor(timing_Departure.length/3)].length; i++) {
+		dps2.push({y: ((-timing_Departure[Math.floor(timing_Departure.length/3)][i-1] + timing_Arrival[Math.floor(timing_Departure.length/3)][i])/60), label: stops[i-1]});
+	}
+	for (var i=1; i < timing_Departure[timing_Departure.length-1].length; i++) {
+		dps3.push({y: ((-timing_Departure[timing_Departure.length-1][i-1] + timing_Arrival[timing_Departure.length-1][i])/60), label: stops[i-1]});
+	}
+	console.log(dps1.length);
+	console.log(dps2);
+	console.log(dps3);
+
 	var options = {
 		animationEnabled: true,  
-		title:{ text: "Monthly Sales - 2017" },
-		axisX: { valueFormatString: "MMM" },
-		axisY: { title: "Sales (in USD)", prefix: "$", includeZero: false },
-		data: [{
-			yValueFormatString: "$#,###",
-			xValueFormatString: "MMMM",
-			type: "spline",
-			dataPoints: [
-				{ x: new Date(2017, 0), y: 25060 },
-				{ x: new Date(2017, 1), y: 27980 },
-				{ x: new Date(2017, 2), y: 33800 },
-				{ x: new Date(2017, 3), y: 49400 },
-				{ x: new Date(2017, 4), y: 40260 },
-				{ x: new Date(2017, 5), y: 33900 },
-				{ x: new Date(2017, 6), y: 48000 },
-				{ x: new Date(2017, 7), y: 31500 },
-				{ x: new Date(2017, 8), y: 32300 },
-				{ x: new Date(2017, 9), y: 42000 },
-				{ x: new Date(2017, 10), y: 52160 },
-				{ x: new Date(2017, 11), y: 49400 }
-			]
+		title:{ text: "Time to reach Stops" },
+		axisX: { valueFormatString: "0" },
+		axisY: { title: "Time", includeZero: false },
+		legend: { fontSize: 20, fontFamily: "tamoha", fontColor: "Sienna"},
+		data: [
+			{
+				showInLegend: true,
+            	xValueFormatString: "MMMMMMM",
+            	yValueFormatString: "## minutes",
+				legendText: "Morning",
+				type: "spline",
+				color: "#0AB49B",
+				// color:"#FF0000",
+				dataPoints: dps1
+			}, {
+				showInLegend: true,
+            	xValueFormatString: "MMMMMMM",
+            	yValueFormatString: "## minutes",
+				legendText: "Midday",
+				type: "spline",
+				color: "#C41920",
+				// color:"#0000FF",
+				dataPoints: dps2
+			}, {
+				showInLegend: true,
+            	xValueFormatString: "MMMMMMM",
+            	yValueFormatString: "## minutes",
+				legendText: "Night",
+				type: "spline",
+				color: "#FD9620",
+				// color: "#00FF00",
+				dataPoints: dps3
 		}]
 	};
 	$("#chartContainer").CanvasJSChart(options);
 }
 
-var polypoints = {};
-var datapoints = [];
-var way_points = [];
-var way_point = [];
-var vechicleref = 0;
-var origin = 0;
-var destination = 0;
-var count = 0;
-var marker_bus = null;
-var timings = [];
 
 function initMap() {
 	fetch('http://api.511.org/transit/timetable?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&operator_id=SC&line_id=22&format=JSON').then(function (response) {
@@ -74,20 +105,22 @@ function initMap() {
 			datapoints.push(item.PointRef.ref);
 			polypoints[item.PointRef.ref] = 0;
 		});
-		// console.log(obj.Content.TimetableFrame[2].vehicleJourneys.ServiceJourney)
+		console.log(datapoints);
 		var j = 0;
 		obj.Content.TimetableFrame[2].vehicleJourneys.ServiceJourney.forEach(function(item) {
 			// console.log(item)
-			var i = 0;
+			timing_Departure.push([])
+			timing_Arrival.push([])
 			item.calls.Call.forEach(function(item_) {
-				console.log("works")
-				console.log(Date.parse(item_.Departure.Time))
-
-				// timings[j][i++].push(Departure.getTime() - Arrival.getTime()/1000);
+				// console.log("works")
+				timing_Departure[j].push(Number(Date.parse("2011-10-11T"+item_.Departure.Time))/1000);
+				timing_Arrival[j].push(Number(Date.parse("2011-10-11T"+item_.Arrival.Time))/1000);
 			});
 			j++;
 		});
-		console.log(timings);
+		// console.log("Time");
+		// console.log(timing_Departure[0]);
+		makeChart();
 		// console.log(datapoints);
 	}).catch(function (error) {
 		console.error('Something went wrong');
@@ -113,14 +146,14 @@ function initMap() {
 						return;
 					}
 				} else {
-					console.log("no prop");
+					console.log("no such property");
 				}
 			});
 		});
-		// console.log(polypoints);
+		console.log(polypoints);
 		return routeDisplay();
 	}).catch(function (error) {
-		console.error('Something went wrong1');
+		console.error('Something went wrong');
 	});
 }
 
@@ -175,7 +208,6 @@ function busDisplayRef(directionsService, directionsRenderer, map) {
 						console.log("if Palo Alto");
 						vechicleref = mSV[i].MonitoredVehicleJourney.VehicleRef;
 						console.log(vechicleref);
-						// return false;
 						break; 
 					// } else if(mSV[i].MonitoredVehicleJourney.OriginRef == 65812 && mSV[i].MonitoredVehicleJourney.DestinationRef == 60328){
 					//     console.log("if Eastridge");
@@ -210,17 +242,15 @@ function busDisplayLoc(directionsService, directionsRenderer, map) {
 		for (var i in vehicleactivity) {
 			if (vehicleactivity[i].MonitoredVehicleJourney.hasOwnProperty("VehicleRef")) {
 				if(vehicleactivity[i].MonitoredVehicleJourney.VehicleRef == vechicleref){
-					// console.log(Number(vehicleactivity[i].MonitoredVehicleJourney.Bearing));
-					// var markers = [];
 					count++
-					var icon = { // car icon
+					var icon = {
 						path: 'M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759   c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z    M32.618,10.773c-1.016,3.9-2.219,8.51-2.219,8.51H16.631l-2.222-8.51C14.41,10.773,23.293,7.755,32.618,10.773z M15.741,21.713   v4.492l-2.73-0.349V14.502L15.741,21.713z M13.011,37.938V27.579l2.73,0.343v8.196L13.011,37.938z M14.568,40.882l2.218-3.336   h13.771l2.219,3.336H14.568z M31.321,35.805v-7.872l2.729-0.355v10.048L31.321,35.805',
 						scale: 0.8,
-						fillColor: "#427af4", //<-- Car Color, you can change it 
+						fillColor: "#427af4",
 						fillOpacity: 1,
 						strokeWeight: 1,
 						anchor: new google.maps.Point(0, 5),
-						rotation: Number(vehicleactivity[i].MonitoredVehicleJourney.Bearing) //<-- Car angle
+						rotation: Number(vehicleactivity[i].MonitoredVehicleJourney.Bearing) 
 					};
 
 					var point = new google.maps.LatLng(vehicleactivity[i].MonitoredVehicleJourney.VehicleLocation.Latitude, vehicleactivity[i].MonitoredVehicleJourney.VehicleLocation.Longitude);
@@ -258,11 +288,11 @@ function busDisplayLoc(directionsService, directionsRenderer, map) {
 	//This promise will resolve when 60 seconds have passed (number of requests for API is 60 per 3600 seconds)
 	var timeOutPromise = new Promise(function(resolve, reject) {
 	  // 60 Second delay
-	  setTimeout(resolve, 60000, 'Timeout Done');
+	  setTimeout(resolve, 61000, 'Timeout Done');
 	});
 
 	Promise.all([fetchPromise, timeOutPromise]).then(function(values) {
-	  console.log("Atleast 4 secs + TTL (Network/server)");
+	  console.log("Atleast 60 secs + TTL (Network/server)");
 	  busDisplayLoc(directionsService, directionsRenderer, map);
 	});
 }

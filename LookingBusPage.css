@@ -231,7 +231,7 @@ a.article, a.article:hover {
     position: fixed;
     bottom: -100%;
     left: 0;
-    height: 400px;
+    height: 335px;
     z-index: 999;
     background: #7386D5;
     color: #fff;
