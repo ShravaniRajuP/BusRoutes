@@ -11,7 +11,7 @@
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
-        <!-- Our Custom CSS -->
+        <!-- Custom CSS -->
         <link rel="stylesheet" type="text/css" href="LookingBusPage.css">
 
         <!-- Scrollbar Custom CSS -->
@@ -44,32 +44,30 @@
             $(document).ready(sideBar);
 
             $(document).ready(bottomwDrawer);
-
         </script>
 	</head>
 
 	<body id="page-top" data-gr-c-s-loaded="true" class="has-drawer">
-        <!-- <p> Hello There </p> -->
 
+        <!-- Overlay for BottomDrawer -->
         <div class="overlay"></div>
 
+        <!-- BottomDrawer Holder -->
         <nav id="bottomdrawer">
             <div id="dismiss">
                 <i class="fa fa-arrow-down" aria-hidden="true"></i>
             </div>
-
             <div class="bottomdrawer-header">
-                <h3>Bootstrap bottomdrawer</h3>
+                <h3>Time to Reach a Stop at Different Times of Traffic</h3>
                 <div id="chartContainer" style="height:250px; width: 100%;"></div>
             </div>
         </nav>
 
+        <!-- Window Content Wrapper -->
         <div class="wrapper">
+
             <!-- Sidebar Holder -->
             <nav id="sidebar" class="sticky-top">
-                <!-- <div class="sidebar-header">
-                    Meh
-                </div> -->
 
                 <ul class="list-unstyled components">
                     <li class="active">
