@@ -10,6 +10,7 @@ var count = 0;
 var marker_bus = null;
 var timing_Departure = [];
 var timing_Arrival = [];
+var api_key = '08baff0c-3159-436f-8bf1-d97dd5273def'
 
 // sideBar open & close
 function sideBar() {
@@ -99,7 +100,7 @@ function makeChart(){
 // Map Initialization
 function initMap() {
 	// Fetching Stop Reference IDs of Stops that come into one route
-	fetch('http://api.511.org/transit/timetable?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&operator_id=SC&line_id=22&format=JSON').then(function (response) {
+	fetch('http://api.511.org/transit/timetable?api_key='+api_key+'&operator_id=SC&line_id=22&format=JSON').then(function (response) {
 				return response.json();
 	}).then(function (obj) {
 		// console.log("fetch id");
@@ -133,7 +134,7 @@ function initMap() {
 	});
 
 	// Fetching Object that holds all Details about Stops (Choosing stops belonging to one route)
-	fetch('http://api.511.org/transit/stops?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&operator_id=SC&format=JSON').then(function (response) {
+	fetch('http://api.511.org/transit/stops?api_key='+api_key+'&operator_id=SC&format=JSON').then(function (response) {
 		return response.json();
 	}).then(function (obj) {
 		// console.log("fetch Loc");
@@ -206,7 +207,7 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer, o, d, w
 // Here, any one bus is selected first, and that bus is followed till it reaches the end of the route, and so on
 // Only one side is selected for simplicity & to prevent confusions
 function busDisplayRef(directionsService, directionsRenderer, map) {
-	fetch('http://api.511.org/transit/StopMonitoring?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&agency=SC&format=JSON').then(function (response) {
+	fetch('http://api.511.org/transit/StopMonitoring?api_key='+api_key+'&agency=SC&format=JSON').then(function (response) {
 		return response.json();
 	}).then(function (obj) {
 		// console.log("fetch StopMonitoring");
@@ -242,7 +243,7 @@ function busDisplayRef(directionsService, directionsRenderer, map) {
 
 // Fetch Real-time Vehicle location coordinates & place the bus icon in that position until timeout
 function busDisplayLoc(directionsService, directionsRenderer, map) {
-	const fetchPromise = fetch('http://api.511.org/transit/VehicleMonitoring?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&agency=SC&format=JSON');
+	const fetchPromise = fetch('http://api.511.org/transit/VehicleMonitoring?api_key='+api_key+'&agency=SC&format=JSON');
 
 	fetchPromise.then(function (response) {
 		return response.json();
