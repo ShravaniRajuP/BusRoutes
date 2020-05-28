@@ -31,16 +31,11 @@ body {
     height: 2em;
 }
 
-/* Change background on mouse-over */
-.navbar img: hover {
-    opacity: 0;
-}
-
 /* ---------------------------------------------------
     SIDEBAR STYLE
 ----------------------------------------------------- */
 .wrapper {
-    flex: 0 0 88%; /* ~ 2 * 33.33% */
+    flex: 0 0 88%;
     display: flex;
     width: 100%;
     align-items: stretch;
@@ -139,7 +134,6 @@ a.article, a.article:hover {
     color: #fff !important;
 }
 
-
 /* ---------------------------------------------------
     CONTENT STYLE
 ----------------------------------------------------- */
@@ -186,42 +180,6 @@ a.article, a.article:hover {
     transform: none;
     opacity: 1;
 }
-
-
-/* ---------------------------------------------------
-    MEDIAQUERIES
------------------------------------------------------ */
-@media (max-width: 768px) {
-    #sidebar {
-        margin-left: -200px;
-        transform: rotateY(90deg);
-    }
-    #sidebar.active {
-        margin-left: 0;
-        transform: none;
-    }
-    #sidebarCollapse span:first-of-type,
-    #sidebarCollapse span:nth-of-type(2),
-    #sidebarCollapse span:last-of-type {
-        transform: none;
-        opacity: 1;
-        margin: 5px auto;
-    }
-    #sidebarCollapse.active span {
-        margin: 0 auto;
-    }
-    #sidebarCollapse.active span:first-of-type {
-        transform: rotate(45deg) translate(2px, 2px);
-    }
-    #sidebarCollapse.active span:nth-of-type(2) {
-        opacity: 0;
-    }
-    #sidebarCollapse.active span:last-of-type {
-        transform: rotate(-45deg) translate(1px, -1px);
-    }
-
-}
-
 
 /* ---------------------------------------------------
     bottomdrawer STYLE
