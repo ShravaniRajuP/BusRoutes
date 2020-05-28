@@ -1,3 +1,4 @@
+// Global Variables
 var polypoints = {};
 var datapoints = [];
 var way_points = [];
@@ -10,12 +11,14 @@ var marker_bus = null;
 var timing_Departure = [];
 var timing_Arrival = [];
 
+// sideBar open & close
 function sideBar() {
 	$('#sidebarCollapse').on('click', function () {
 		$('#sidebar').toggleClass('active');
 	});
 }
 
+// bottomDrawer open, close, animations, etc
 function bottomwDrawer() {
 	$("#bottomdrawer").mCustomScrollbar({
 		theme: "minimal"
@@ -34,14 +37,13 @@ function bottomwDrawer() {
 	});
 }
 
+// making Stops vs Time Chart, holds different lines for different parts of the day 
 function makeChart(){
 	var dps1 = [];
 	var dps2 = [];
 	var dps3 = [];
 	var stops = ["PAT-Cal", "Cal-Sh", "Sh-Cas", "Cas-Su_Sa", "Su_Sa-W", "Wo-Ke", "Ke-SCTC", "SCT-AN", 
 				"AN-SC1st", "SC-KAR", "KAR-KS", "KS-ETC"];
-	console.log(timing_Departure[0].length);
-	console.log(timing_Departure[Math.floor(timing_Departure.length/3)].length);
 	for (var i=1; i < timing_Departure[0].length; i++) {
 		dps1.push({y: ((-timing_Departure[0][i-1] + timing_Arrival[0][i])/60), label: stops[i-1]});
 	}
@@ -51,9 +53,9 @@ function makeChart(){
 	for (var i=1; i < timing_Departure[timing_Departure.length-1].length; i++) {
 		dps3.push({y: ((-timing_Departure[timing_Departure.length-1][i-1] + timing_Arrival[timing_Departure.length-1][i])/60), label: stops[i-1]});
 	}
-	console.log(dps1.length);
-	console.log(dps2);
-	console.log(dps3);
+	// console.log(dps1);
+	// console.log(dps2);
+	// console.log(dps3);
 
 	var options = {
 		animationEnabled: true,  
@@ -94,18 +96,21 @@ function makeChart(){
 	$("#chartContainer").CanvasJSChart(options);
 }
 
-
+// Map Initialization
 function initMap() {
+	// Fetching Stop Reference IDs of Stops that come into one route
 	fetch('http://api.511.org/transit/timetable?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&operator_id=SC&line_id=22&format=JSON').then(function (response) {
 				return response.json();
 	}).then(function (obj) {
-		console.log("fetch id");
-		console.log(obj);
+		// console.log("fetch id");
+		// console.log(obj);
+		// Storing Stop Ref IDs in an array object ... 
 		obj.Content.ServiceFrame.routes.Route[2].pointsInSequence.PointOnRoute.forEach(function(item) {
 			datapoints.push(item.PointRef.ref);
 			polypoints[item.PointRef.ref] = 0;
 		});
-		console.log(datapoints);
+		// console.log(datapoints);
+		// Storing Expected Arrival & Departure times for Stops
 		var j = 0;
 		obj.Content.TimetableFrame[2].vehicleJourneys.ServiceJourney.forEach(function(item) {
 			// console.log(item)
@@ -120,12 +125,14 @@ function initMap() {
 		});
 		// console.log("Time");
 		// console.log(timing_Departure[0]);
+
+		// Start making the chart, now that all data is available
 		makeChart();
-		// console.log(datapoints);
 	}).catch(function (error) {
 		console.error('Something went wrong');
 	});
 
+	// Fetching Object that holds all Details about Stops (Choosing stops belonging to one route)
 	fetch('http://api.511.org/transit/stops?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&operator_id=SC&format=JSON').then(function (response) {
 		return response.json();
 	}).then(function (obj) {
@@ -150,13 +157,14 @@ function initMap() {
 				}
 			});
 		});
-		console.log(polypoints);
+		// console.log(polypoints);
 		return routeDisplay();
 	}).catch(function (error) {
 		console.error('Something went wrong');
 	});
 }
 
+// Start drawing the possible Route between Stops
 function routeDisplay() {
 	var directionsService = new google.maps.DirectionsService();
 	var directionsRenderer = new google.maps.DirectionsRenderer();
@@ -179,6 +187,7 @@ function routeDisplay() {
 	busDisplayRef(directionsService, directionsRenderer, map);    
 }
 
+// Directions API used to draw route between stops
 function calculateAndDisplayRoute(directionsService, directionsRenderer, o, d, w) {
 	directionsService.route({origin: o, destination: d, waypoints: w, travelMode: 'DRIVING'},
 		// origin: new google.maps.LatLng(37.44375, -122.165763),
@@ -186,13 +195,16 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer, o, d, w
 	function(response, status) {
 		if (status === 'OK') {
 			directionsRenderer.setDirections(response);
-			console.log("waypoints This works");
+			// console.log("waypoints This works");
 		} else {
 			window.alert('Directions request failed due to ' + status);
 		}
 	});
 }
 
+// Draw Bus (car here) Icon & show it moving around as per real-time data
+// Here, any one bus is selected first, and that bus is followed till it reaches the end of the route, and so on
+// Only one side is selected for simplicity & to prevent confusions
 function busDisplayRef(directionsService, directionsRenderer, map) {
 	fetch('http://api.511.org/transit/StopMonitoring?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&agency=SC&format=JSON').then(function (response) {
 		return response.json();
@@ -228,6 +240,7 @@ function busDisplayRef(directionsService, directionsRenderer, map) {
 	});
 }
 
+// Fetch Real-time Vehicle location coordinates & place the bus icon in that position until timeout
 function busDisplayLoc(directionsService, directionsRenderer, map) {
 	const fetchPromise = fetch('http://api.511.org/transit/VehicleMonitoring?api_key=08baff0c-3159-436f-8bf1-d97dd5273def&agency=SC&format=JSON');
 
@@ -238,7 +251,7 @@ function busDisplayLoc(directionsService, directionsRenderer, map) {
 		// console.log(obj);
 		// console.log(vechicleref);
 		var vehicleactivity = obj.Siri.ServiceDelivery.VehicleMonitoringDelivery.VehicleActivity;
-		console.log(vehicleactivity);
+		// console.log(vehicleactivity);
 		for (var i in vehicleactivity) {
 			if (vehicleactivity[i].MonitoredVehicleJourney.hasOwnProperty("VehicleRef")) {
 				if(vehicleactivity[i].MonitoredVehicleJourney.VehicleRef == vechicleref){
@@ -285,6 +298,7 @@ function busDisplayLoc(directionsService, directionsRenderer, map) {
 		console.error('Something went wrong');
 	});
 
+	// Timeout to make sure API limit is not exceeded
 	//This promise will resolve when 60 seconds have passed (number of requests for API is 60 per 3600 seconds)
 	var timeOutPromise = new Promise(function(resolve, reject) {
 	  // 60 Second delay
