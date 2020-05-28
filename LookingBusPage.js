@@ -59,7 +59,7 @@ function makeChart(){
 
 	var options = {
 		animationEnabled: true,  
-		title:{ text: "Time to reach Stops" },
+		title:{ text: "Time  vs  Pairs of Stops" },
 		axisX: { valueFormatString: "0" },
 		axisY: { title: "Time", includeZero: false },
 		legend: { fontSize: 20, fontFamily: "tamoha", fontColor: "Sienna"},
