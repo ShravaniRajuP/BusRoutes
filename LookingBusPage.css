@@ -11,7 +11,6 @@ body {
 }
 
 #map {
-    flex: 0 0 88%; 
     height: 100vh;
 }
 
@@ -35,7 +34,6 @@ body {
     SIDEBAR STYLE
 ----------------------------------------------------- */
 .wrapper {
-    flex: 0 0 88%;
     display: flex;
     width: 100%;
     align-items: stretch;
